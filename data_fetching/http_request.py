@@ -15,7 +15,8 @@ def get_stats():
     except requests.exceptions.RequestException as e:
         print(f"Erros during request : {e}")
         return None
-    
+
+
 def get_trends():
     try:
         response = requests.get(TRENDS_URL)
@@ -25,7 +26,8 @@ def get_trends():
     except requests.exceptions.RequestException as e:
         print(f"Erros during request : {e}")
         return None
-    
+
+
 def get_history():
     try:
         response = requests.get(HISTORY_URL)
@@ -35,7 +37,8 @@ def get_history():
     except requests.exceptions.RequestException as e:
         print(f"Erros during request : {e}")
         return None
-    
+
+
 if __name__ == "__main__":
     stats = get_stats()
     trends = get_trends()
