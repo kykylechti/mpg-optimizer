@@ -22,7 +22,9 @@ ECONOMIC_COLS = [
 
 COLS_TO_DROP = [
     ["cleansheet", "corner_gagn"],
-    ["ballons", "balle_non_rattrap_e"]
+    ["ballons", "balle_non_rattrap_e"],
+    ["prochain_opposant", "unnamed_120"]
+
 ]
 
 
