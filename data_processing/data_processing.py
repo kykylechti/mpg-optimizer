@@ -6,7 +6,6 @@ import pandas as pd
 ECONOMIC_COLS = [
     "cote",
     "var_cote",
-    "cote_pr_dite",
     "ench_re_moy",
     "achat",
     "achat_tour_1",
@@ -23,6 +22,7 @@ ECONOMIC_COLS = [
 COLS_TO_DROP = [
     ["cleansheet", "corner_gagn"],
     ["ballons", "balle_non_rattrap_e"],
+    ["cote_pr_dite", "cote_pr_dite"],
     ["prochain_opposant", "unnamed_120"]
 ]
 
