@@ -24,7 +24,6 @@ COLS_TO_DROP = [
     ["cleansheet", "corner_gagn"],
     ["ballons", "balle_non_rattrap_e"],
     ["prochain_opposant", "unnamed_120"]
-
 ]
 
 
@@ -60,6 +59,8 @@ def removing_useless_columns(players: pd.DataFrame) -> pd.DataFrame:
             cols_to_drop = clean_players.columns[start_idx : end_idx + 1]
 
             clean_players = clean_players.drop(columns=cols_to_drop)
+
+    clean_players = pd.get_dummies(clean_players, columns=["poste"], prefix="poste")
 
     return clean_players
 
