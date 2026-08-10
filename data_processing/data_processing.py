@@ -20,6 +20,11 @@ ECONOMIC_COLS = [
     "q3_10_joueurs",
 ]
 
+COLS_TO_DROP = [
+    ["cleansheet", "corner_gagn"],
+    ["ballons", "balle_non_rattrap_e"]
+]
+
 
 def clean_column_name(col_name):
     nfkd_form = unicodedata.normalize("NFKD", col_name)
@@ -32,6 +37,29 @@ def clean_column_name(col_name):
     clean_name = "_".join([part for part in clean_name.split("_") if part])
 
     return clean_name
+
+def removing_useless_columns(players: pd.DataFrame) -> pd.DataFrame:
+    """
+    Remove useless columns from the DataFrame.
+
+    Args:
+        df (pd.DataFrame): DataFrame containing player data.
+
+    Returns:
+        pd.DataFrame: DataFrame with useless columns removed.
+    """
+    clean_players = players.copy()
+
+    for start_col, end_col in COLS_TO_DROP:
+        if start_col in clean_players.columns and end_col in clean_players.columns:
+            start_idx = clean_players.columns.get_loc(start_col)
+            end_idx = clean_players.columns.get_loc(end_col)
+
+            cols_to_drop = clean_players.columns[start_idx : end_idx + 1]
+
+            clean_players = clean_players.drop(columns=cols_to_drop)
+
+    return clean_players
 
 
 def process_data(players: pd.DataFrame) -> pd.DataFrame:
@@ -57,6 +85,8 @@ def process_data(players: pd.DataFrame) -> pd.DataFrame:
         if not mode_series.empty:
             valeur_frequente = mode_series[0]
             processed_players.fillna({col: valeur_frequente}, inplace=True)
+
+    processed_players = removing_useless_columns(processed_players)
 
     return processed_players
 
