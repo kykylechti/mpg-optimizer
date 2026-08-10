@@ -23,6 +23,13 @@ COLS_TO_DROP = [
     ["cleansheet", "corner_gagn"],
     ["ballons", "balle_non_rattrap_e"],
     ["cote_pr_dite", "cote_pr_dite"],
+    ["but", "titu_s_rie"],
+    ["note", "note_s_rie"],
+    ["note_m11", "nb_match_s_rie"],
+    ["temps", "temps_s_rie"],
+    ["tps_moy", "tps_moy_s_rie"],
+    ["min_but", "min_but"],
+    ["prix_but", "prix_but"],
     ["prochain_opposant", "unnamed_120"]
 ]
 
@@ -60,8 +67,6 @@ def removing_useless_columns(players: pd.DataFrame) -> pd.DataFrame:
 
             clean_players = clean_players.drop(columns=cols_to_drop)
 
-    clean_players = pd.get_dummies(clean_players, columns=["poste"], prefix="poste")
-
     return clean_players
 
 
@@ -88,6 +93,8 @@ def process_data(players: pd.DataFrame) -> pd.DataFrame:
         if not mode_series.empty:
             valeur_frequente = mode_series[0]
             processed_players.fillna({col: valeur_frequente}, inplace=True)
+
+    processed_players    = pd.get_dummies(processed_players, columns=["poste"], prefix="poste")
 
     processed_players = removing_useless_columns(processed_players)
 
