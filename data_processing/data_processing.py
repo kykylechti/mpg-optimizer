@@ -53,8 +53,10 @@ def process_data(players: pd.DataFrame) -> pd.DataFrame:
 
     # Filling missing values for economic columns with the most frequent value
     for col in ECONOMIC_COLS:
-        valeur_frequente = processed_players[col].mode()
-        processed_players.fillna({col: valeur_frequente}, inplace=True)
+        mode_series = processed_players[col].mode()
+        if not mode_series.empty:
+            valeur_frequente = mode_series[0]
+            processed_players.fillna({col: valeur_frequente}, inplace=True)
 
     return processed_players
 
