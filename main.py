@@ -1,6 +1,6 @@
-import pandas as pd
+from data_processing.data_processing import load_data
 
 
-df_players = pd.read_csv("data/players.csv", sep=";", encoding="latin1")
+df_players = load_data()
 
 print(df_players)
