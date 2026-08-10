@@ -1,8 +1,40 @@
 from pathlib import Path
+import unicodedata
 import pandas as pd
 
 
-def process_data(player: pd.DataFrame) -> pd.DataFrame:
+ECONOMIC_COLS = [
+    "cote",
+    "var_cote",
+    "cote_pr_dite",
+    "ench_re_moy",
+    "achat",
+    "achat_tour_1",
+    "q2_toutes_tailles",
+    "q3_toutes_tailles",
+    "q2_6_joueurs",
+    "q3_6_joueurs",
+    "q2_8_joueurs",
+    "q3_8_joueurs",
+    "q2_10_joueurs",
+    "q3_10_joueurs",
+]
+
+
+def clean_column_name(col_name):
+    nfkd_form = unicodedata.normalize("NFKD", col_name)
+    ascii_name = "".join([c for c in nfkd_form if not unicodedata.combining(c)])
+
+    clean_name = ascii_name.lower()
+
+    clean_name = "".join(c if c.isalnum() else "_" for c in clean_name)
+
+    clean_name = "_".join([part for part in clean_name.split("_") if part])
+
+    return clean_name
+
+
+def process_data(players: pd.DataFrame) -> pd.DataFrame:
     """
     Process the player data.
 
@@ -12,7 +44,20 @@ def process_data(player: pd.DataFrame) -> pd.DataFrame:
     Returns:
         pd.DataFrame: Processed DataFrame.
     """
-    ...
+    processed_players = players.copy()
+
+    # Cleaning column names
+    processed_players.columns = [
+        clean_column_name(col) for col in processed_players.columns
+    ]
+
+    # Filling missing values for economic columns with the most frequent value
+    for col in ECONOMIC_COLS:
+        valeur_frequente = processed_players[col].mode()
+        processed_players.fillna({col: valeur_frequente}, inplace=True)
+
+    return processed_players
+
 
 def load_data() -> pd.DataFrame:
     """
@@ -21,7 +66,4 @@ def load_data() -> pd.DataFrame:
     Returns:
         pd.DataFrame: DataFrame containing player data.
     """
-    current_file = Path(__file__)
-    file_path = current_file.parent.parent / "data" / "players.csv"
-
-    return pd.read_csv(file_path, sep=";", encoding="latin1")
+    return pd.read_csv("data/players.csv", sep=";", encoding="utf-8")
