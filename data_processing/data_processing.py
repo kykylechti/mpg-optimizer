@@ -87,14 +87,16 @@ def process_data(players: pd.DataFrame) -> pd.DataFrame:
         clean_column_name(col) for col in processed_players.columns
     ]
 
-    # Filling missing values for economic columns with the most frequent value
+    # Filling missing values for economic columns with the most frequent value at the same position
     for col in ECONOMIC_COLS:
-        mode_series = processed_players[col].mode()
-        if not mode_series.empty:
-            valeur_frequente = mode_series[0]
-            processed_players.fillna({col: valeur_frequente}, inplace=True)
+        if col in processed_players.columns:
+            mode_par_poste = processed_players.groupby("poste")[col].transform(
+                lambda x: x.mode()[0] if not x.mode().empty else None
+            )
 
-    processed_players    = pd.get_dummies(processed_players, columns=["poste"], prefix="poste")
+            processed_players[col] = processed_players[col].fillna(mode_par_poste)
+
+    processed_players = pd.get_dummies(processed_players, columns=["poste"], prefix="poste")
 
     processed_players = removing_useless_columns(processed_players)
 
