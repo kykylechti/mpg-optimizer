@@ -1,6 +1,7 @@
 from pathlib import Path
 import unicodedata
 import pandas as pd
+from sklearn.preprocessing import MinMaxScaler
 
 
 ECONOMIC_COLS = [
@@ -30,13 +31,12 @@ COLS_TO_DROP = [
     ["tps_moy", "tps_moy_s_rie"],
     ["min_but", "min_but"],
     ["prix_but", "prix_but"],
-    ["prochain_opposant", "unnamed_120"]
+    ["prochain_opposant", "unnamed_120"],
 ]
 
 
 def clean_column_name(col_name):
-    """
-    """
+    """ """
     nfkd_form = unicodedata.normalize("NFKD", col_name)
     ascii_name = "".join([c for c in nfkd_form if not unicodedata.combining(c)])
 
@@ -48,9 +48,10 @@ def clean_column_name(col_name):
 
     return clean_name
 
+
 def removing_useless_columns(players: pd.DataFrame) -> pd.DataFrame:
     """
-    Clean and normalize a column name by removing accents, converting to lowercase, 
+    Clean and normalize a column name by removing accents, converting to lowercase,
     and replacing special characters with underscores.
 
     Args:
@@ -72,6 +73,46 @@ def removing_useless_columns(players: pd.DataFrame) -> pd.DataFrame:
 
     return clean_players
 
+
+def normalize_economic_columns(players: pd.DataFrame) -> None:
+    """
+    Normalize economic columns in the player DataFrame using Min-Max scaling.
+
+    Args:
+        players (pd.DataFrame): DataFrame containing player data.
+
+    Returns:
+        pd.DataFrame: DataFrame with normalized economic columns.
+    """
+    processed_players = players.copy()
+
+    scaler = MinMaxScaler()
+
+    processed_players[ECONOMIC_COLS] = scaler.fit_transform(processed_players[ECONOMIC_COLS])
+    return processed_players
+
+
+def clean_numeric_columns(df: pd.DataFrame, cols: list) -> pd.DataFrame:
+    """
+    Clean and convert specified economic columns to numeric float type by replacing 
+    commas with dots and removing unwanted symbols like percentages.
+
+    Args:
+        df (pd.DataFrame): DataFrame containing player data.
+        cols (list): List of column names to clean and convert.
+
+    Returns:
+        pd.DataFrame: DataFrame with cleaned numeric columns.
+    """
+    df_clean = df.copy()
+    for col in cols:
+        if col in df_clean.columns:
+            if df_clean[col].dtype == "object":
+                df_clean[col] = df_clean[col].astype(str).str.replace(",", ".")
+                df_clean[col] = df_clean[col].str.replace("%", "").str.strip()
+            df_clean[col] = pd.to_numeric(df_clean[col], errors="coerce")
+            
+    return df_clean
 
 def process_data(players: pd.DataFrame) -> pd.DataFrame:
     """
@@ -99,9 +140,14 @@ def process_data(players: pd.DataFrame) -> pd.DataFrame:
 
             processed_players[col] = processed_players[col].fillna(mode_par_poste)
 
-    processed_players = pd.get_dummies(processed_players, columns=["poste"], prefix="poste")
+    processed_players = pd.get_dummies(
+        processed_players, columns=["poste"], prefix="poste"
+    )
 
     processed_players = removing_useless_columns(processed_players)
+
+    processed_players = clean_numeric_columns(processed_players, ECONOMIC_COLS)
+    processed_players = normalize_economic_columns(processed_players)
 
     return processed_players
 
