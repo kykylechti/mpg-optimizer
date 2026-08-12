@@ -144,8 +144,10 @@ def process_data(players: pd.DataFrame) -> pd.DataFrame:
         processed_players, columns=["poste"], prefix="poste"
     )
 
+    # Removing useless columns
     processed_players = removing_useless_columns(processed_players)
 
+    # Normalizing economic columns
     processed_players = clean_numeric_columns(processed_players, ECONOMIC_COLS)
     processed_players = normalize_economic_columns(processed_players)
 
