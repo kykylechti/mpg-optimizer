@@ -24,7 +24,6 @@ COLS_TO_DROP = [
     ["cleansheet", "corner_gagn"],
     ["ballons", "balle_non_rattrap_e"],
     ["cote_pr_dite", "cote_pr_dite"],
-    ["but", "titu_s_rie"],
     ["note", "note_s_rie"],
     ["note_m11", "nb_match_s_rie"],
     ["temps", "temps_s_rie"],
@@ -114,12 +113,33 @@ def clean_numeric_columns(df: pd.DataFrame, cols: list) -> pd.DataFrame:
             
     return df_clean
 
+def feature_engineering(players: pd.DataFrame) -> pd.DataFrame:
+    """
+    Perform feature engineering on the player DataFrame.
+
+    Args:
+        players (pd.DataFrame): DataFrame containing player data.
+
+    Returns:
+        pd.DataFrame: DataFrame with engineered features.
+    """
+    processed_players = players.copy()
+    
+    scaler = MinMaxScaler()
+    processed_players["but"] = scaler.fit_transform(processed_players["but"].values.reshape(-1, 1))
+
+    # create a new feature "price_goal_ratio" that equals the ratio of "but" to "cote" if both columns exist
+    if "cote" in processed_players.columns and "but" in processed_players.columns:
+        processed_players["price_goal_ratio"] = processed_players["but"] / processed_players["cote"]
+
+    return processed_players
+
 def process_data(players: pd.DataFrame) -> pd.DataFrame:
     """
     Process the player data.
 
     Args:
-        player (pd.DataFrame): DataFrame containing player data.
+        players (pd.DataFrame): DataFrame containing player data.
 
     Returns:
         pd.DataFrame: Processed DataFrame.
@@ -150,6 +170,9 @@ def process_data(players: pd.DataFrame) -> pd.DataFrame:
     # Normalizing economic columns
     processed_players = clean_numeric_columns(processed_players, ECONOMIC_COLS)
     processed_players = normalize_economic_columns(processed_players)
+
+    # Feature engineering
+    processed_players = feature_engineering(processed_players)
 
     return processed_players
 
