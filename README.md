@@ -4,6 +4,8 @@
 
 This project aims to provide the best team available for a MPG mercato. 
 
+# How to install
+
 ## What is MPG ?
 
 MPG is a french app featuring leagues in which you can play with your friends competing accross real football league.
@@ -20,5 +22,11 @@ Each week you face an opponent among the players in your league. Before the begi
 At the end of the gameweek, every players whose notes are high enough to go through the ennemy team scores if they didn't score a real goal.
 
 ## Data source
+
+My data come from [mpgstats](https://www.mpgstats.fr/players/Ligue-1/season) which are updated each season with new players.
+
+## Data processing
+
+The first step of my data processing is to clean and normalize column names by removing accents, converting to lowercase, and replacing special characters with underscores.
 
 ## My strategy

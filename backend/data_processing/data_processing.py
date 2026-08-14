@@ -35,7 +35,16 @@ COLS_TO_DROP = [
 
 
 def clean_column_name(col_name):
-    """ """
+    """
+    Clean and normalize a column name by removing accents, converting to lowercase,
+    and replacing special characters with underscores.
+
+    Args:
+        col_name (str): Original column name.
+
+    Returns:
+        str: The standardized, snake_case column name
+    """
     nfkd_form = unicodedata.normalize("NFKD", col_name)
     ascii_name = "".join([c for c in nfkd_form if not unicodedata.combining(c)])
 
@@ -50,14 +59,17 @@ def clean_column_name(col_name):
 
 def removing_useless_columns(players: pd.DataFrame) -> pd.DataFrame:
     """
-    Clean and normalize a column name by removing accents, converting to lowercase,
-    and replacing special characters with underscores.
+    Removes specific ranges of useless columns from the DataFrame.
+
+    This function iterates over a predefined list of column name pairs (COLS_TO_DROP). 
+    For each (start, end) pair, it identifies their integer positions and drops 
+    all columns within that inclusive range.
 
     Args:
-        col_name (str): Original column name.
+        players (pd.DataFrame): The original DataFrame containing player data.
 
     Returns:
-        str: Cleaned and normalized column name in snake_case.
+        pd.DataFrame: A new DataFrame with the specified column ranges removed.
     """
     clean_players = players.copy()
 
