@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { UploadCloud, FileText } from 'lucide-react';
+import { UploadCloud, FileText, Loader2 } from 'lucide-react';
 
 interface FileUploadProps {
   onDataLoaded: (data: any[]) => void;
@@ -7,64 +7,38 @@ interface FileUploadProps {
 
 export const FileUpload: React.FC<FileUploadProps> = ({ onDataLoaded }) => {
   const [fileName, setFileName] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     setFileName(file.name);
-    const reader = new FileReader();
+    setIsLoading(true);
+    setError(null);
 
-    reader.onload = (event) => {
-      try {
-        const content = event.target?.result as string;
-        const parsedData = parseCSV(content);
-        onDataLoaded(parsedData);
-      } catch (error) {
-        alert("Error reading CSV file. Please make sure it is a valid format.");
-      }
-    };
+    const formData = new FormData();
+    formData.append("file", file);
 
-    // ISO-8859-1 encoding handles French accents properly from Excel CSV exports
-    reader.readAsText(file, 'ISO-8859-1');
-  };
-
-  // Simple CSV parser supporting comma and semicolon separators + encoding cleanup
-  const parseCSV = (text: string) => {
-    const lines = text.split(/\r\n|\n/);
-    if (lines.length === 0) return [];
-
-    const firstLine = lines[0];
-    const separator = firstLine.includes(';') ? ';' : ',';
-
-    const fixEncoding = (str: string) => {
-      if (!str) return '';
-      return str
-        .replace(/ï¿½/g, 'ï')
-        .replace(/Ã©/g, 'é')
-        .replace(/Ã¨/g, 'è')
-        .replace(/Ã /g, 'à')
-        .replace(/Ã¢/g, 'â')
-        .replace(/Ãª/g, 'ê');
-    };
-
-    const headers = firstLine.split(separator).map(h => fixEncoding(h.trim().replace(/^["']|["']$/g, '')));
-    const result = [];
-
-    for (let i = 1; i < lines.length; i++) {
-      if (!lines[i].trim()) continue;
-      
-      const currentLine = lines[i].split(separator).map(val => fixEncoding(val.trim().replace(/^["']|["']$/g, '')));
-      const obj: { [key: string]: any } = {};
-
-      headers.forEach((header, index) => {
-        obj[header] = currentLine[index] !== undefined ? currentLine[index] : '';
+    try {
+      const response = await fetch("http://localhost:8000/api/process-dataset", {
+        method: "POST",
+        body: formData,
       });
 
-      result.push(obj);
-    }
+      if (!response.ok) {
+        throw new Error("Erreur lors du traitement côté serveur.");
+      }
 
-    return result;
+      const data = await response.json();
+      onDataLoaded(data);
+      
+    } catch (err: any) {
+      setError(err.message || "Cannot connect to API. Is server launched ?");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -74,18 +48,40 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onDataLoaded }) => {
           <UploadCloud size={24} />
         </div>
         <div>
-          <h2 className="text-lg font-semibold text-white">Import Dataset</h2>
-          <p className="text-slate-400 text-xs">Upload your CSV player dataset to start optimizing.</p>
+          <h2 className="text-lg font-semibold text-white">Import & Clean Dataset</h2>
+          <p className="text-slate-400 text-xs">Upload your CSV to process it via the FastAPI backend.</p>
         </div>
       </div>
       
-      <label className="flex flex-col items-center justify-center border-2 border-dashed border-slate-600/60 rounded-xl p-8 cursor-pointer hover:border-emerald-500 hover:bg-slate-700/20 transition group">
-        <FileText className="text-slate-500 group-hover:text-emerald-400 mb-2 transition" size={36} />
+      {error && (
+        <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 text-red-400 text-sm rounded-lg">
+          {error}
+        </div>
+      )}
+
+      <label className={`flex flex-col items-center justify-center border-2 border-dashed rounded-xl p-8 transition group ${
+        isLoading ? 'border-slate-600/30 bg-slate-800/30 cursor-wait' : 'border-slate-600/60 cursor-pointer hover:border-emerald-500 hover:bg-slate-700/20'
+      }`}>
+        {isLoading ? (
+          <Loader2 className="text-emerald-500 animate-spin mb-2" size={36} />
+        ) : (
+          <FileText className="text-slate-500 group-hover:text-emerald-400 mb-2 transition" size={36} />
+        )}
+        
         <span className="text-slate-200 font-medium text-sm">
-          {fileName ? `Selected file: ${fileName}` : "Click here or drag and drop your CSV file"}
+          {isLoading 
+            ? "Processing dataset via API..." 
+            : fileName 
+              ? `Selected file: ${fileName}` 
+              : "Click here or drag and drop your CSV file"}
         </span>
-        <span className="text-slate-500 text-xs mt-1">Format accepted: .csv (Semicolon or Comma separated)</span>
-        <input type="file" accept=".csv" onChange={handleFileChange} className="hidden" />
+        <input 
+          type="file" 
+          accept=".csv" 
+          onChange={handleFileChange} 
+          className="hidden" 
+          disabled={isLoading}
+        />
       </label>
     </div>
   );
