@@ -17,7 +17,7 @@ app.add_middleware(
 @app.post("/api/process-dataset")
 async def process_dataset(file: UploadFile = File(...)):
     if not file.filename.endswith('.csv'):
-        raise HTTPException(status_code=400, detail="Le fichier doit être un CSV.")
+        raise HTTPException(status_code=400, detail="File must be a CSV.")
     
     contents = await file.read()
     
@@ -30,4 +30,4 @@ async def process_dataset(file: UploadFile = File(...)):
         df = process_data(df)
         
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Erreur lors du traitement : {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error during processing : {str(e)}")
