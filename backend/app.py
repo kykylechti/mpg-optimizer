@@ -1,4 +1,4 @@
-from data_processing.data_processing import process_data
+from data_processing.data_processing import process_data, load_data
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import pandas as pd
@@ -23,10 +23,7 @@ async def process_dataset(file: UploadFile = File(...)):
     contents = await file.read()
     
     try:
-        try:
-            df = pd.read_csv(io.BytesIO(contents), sep=';', encoding='utf-8')
-        except UnicodeDecodeError:
-            df = pd.read_csv(io.BytesIO(contents), sep=';', encoding='ISO-8859-1')
+        df = load_data()
 
         df = process_data(df)
         df = df.replace([np.inf, -np.inf], np.nan)
