@@ -119,9 +119,8 @@ def clean_numeric_columns(df: pd.DataFrame, cols: list) -> pd.DataFrame:
     df_clean = df.copy()
     for col in cols:
         if col in df_clean.columns:
-            if df_clean[col].dtype == "object":
-                df_clean[col] = df_clean[col].astype(str).str.replace(",", ".")
-                df_clean[col] = df_clean[col].str.replace("%", "").str.strip()
+            df_clean[col] = df_clean[col].astype(str).str.replace(",", ".")
+            df_clean[col] = df_clean[col].str.replace("%", "").str.strip()
             df_clean[col] = pd.to_numeric(df_clean[col], errors="coerce")
 
     return df_clean
