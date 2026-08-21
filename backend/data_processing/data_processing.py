@@ -1,8 +1,7 @@
-from pathlib import Path
 import unicodedata
+
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
-
 
 ECONOMIC_COLS = [
     "cote",
@@ -61,8 +60,8 @@ def removing_useless_columns(players: pd.DataFrame) -> pd.DataFrame:
     """
     Removes specific ranges of useless columns from the DataFrame.
 
-    This function iterates over a predefined list of column name pairs (COLS_TO_DROP). 
-    For each (start, end) pair, it identifies their integer positions and drops 
+    This function iterates over a predefined list of column name pairs (COLS_TO_DROP).
+    For each (start, end) pair, it identifies their integer positions and drops
     all columns within that inclusive range.
 
     Args:
@@ -99,13 +98,15 @@ def normalize_economic_columns(players: pd.DataFrame) -> None:
 
     scaler = MinMaxScaler()
 
-    processed_players[ECONOMIC_COLS] = scaler.fit_transform(processed_players[ECONOMIC_COLS])
+    processed_players[ECONOMIC_COLS] = scaler.fit_transform(
+        processed_players[ECONOMIC_COLS]
+    )
     return processed_players
 
 
 def clean_numeric_columns(df: pd.DataFrame, cols: list) -> pd.DataFrame:
     """
-    Clean and convert specified economic columns to numeric float type by replacing 
+    Clean and convert specified economic columns to numeric float type by replacing
     commas with dots and removing unwanted symbols like percentages.
 
     Args:
@@ -118,12 +119,12 @@ def clean_numeric_columns(df: pd.DataFrame, cols: list) -> pd.DataFrame:
     df_clean = df.copy()
     for col in cols:
         if col in df_clean.columns:
-            if df_clean[col].dtype == "object":
-                df_clean[col] = df_clean[col].astype(str).str.replace(",", ".")
-                df_clean[col] = df_clean[col].str.replace("%", "").str.strip()
+            df_clean[col] = df_clean[col].astype(str).str.replace(",", ".")
+            df_clean[col] = df_clean[col].str.replace("%", "").str.strip()
             df_clean[col] = pd.to_numeric(df_clean[col], errors="coerce")
-            
+
     return df_clean
+
 
 def feature_engineering(players: pd.DataFrame) -> pd.DataFrame:
     """
@@ -136,15 +137,21 @@ def feature_engineering(players: pd.DataFrame) -> pd.DataFrame:
         pd.DataFrame: DataFrame with engineered features.
     """
     processed_players = players.copy()
-    
-    scaler = MinMaxScaler()
-    processed_players["but"] = scaler.fit_transform(processed_players["but"].values.reshape(-1, 1))
 
-    # create a new feature "price_goal_ratio" that equals the ratio of "but" to "cote" if both columns exist
+    scaler = MinMaxScaler()
+    processed_players["but"] = scaler.fit_transform(
+        processed_players["but"].values.reshape(-1, 1)
+    )
+
+    # create a new feature "price_goal_ratio" that equals the ratio of "but" to "cote"
+    # if both columns exist
     if "cote" in processed_players.columns and "but" in processed_players.columns:
-        processed_players["price_goal_ratio"] = processed_players["but"] / processed_players["cote"]
+        processed_players["price_goal_ratio"] = (
+            processed_players["but"] / processed_players["cote"]
+        )
 
     return processed_players
+
 
 def process_data(players: pd.DataFrame) -> pd.DataFrame:
     """
@@ -163,7 +170,8 @@ def process_data(players: pd.DataFrame) -> pd.DataFrame:
         clean_column_name(col) for col in processed_players.columns
     ]
 
-    # Filling missing values for economic columns with the most frequent value at the same position
+    # Filling missing values for economic columns with the most frequent value at
+    # the same position
     for col in ECONOMIC_COLS:
         if col in processed_players.columns:
             mode_par_poste = processed_players.groupby("poste")[col].transform(
