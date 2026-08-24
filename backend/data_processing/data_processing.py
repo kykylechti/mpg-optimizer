@@ -143,11 +143,23 @@ def feature_engineering(players: pd.DataFrame) -> pd.DataFrame:
         processed_players["but"].values.reshape(-1, 1)
     )
 
+    processed_players["note"] = scaler.fit_transform(
+        processed_players["note"].values.reshape(-1, 1)
+    )
+
     # create a new feature "price_goal_ratio" that equals the ratio of "but" to "cote"
     # if both columns exist
     if "cote" in processed_players.columns and "but" in processed_players.columns:
         processed_players["price_goal_ratio"] = (
             processed_players["but"] / processed_players["cote"]
+        )
+
+        
+    # create a new feature "roi" that equals the ratio of "note" to "cote"
+    # if both columns exist
+    if "cote" in processed_players.columns and "note" in processed_players.columns:
+        processed_players["roi"] = (
+            processed_players["note"] / processed_players["cote"]
         )
 
     return processed_players
