@@ -18,7 +18,7 @@ def test_clean_numeric_columns_handles_commas_and_percent():
     result = clean_numeric_columns(df, ["cote"])
 
     assert result["cote"].tolist() == [1.5, 20.0, 3.2]
-    assert result["cote"].dtype.kind == "f"  # colonne bien convertie en float
+    assert result["cote"].dtype.kind == "f"
 
 
 def test_removing_useless_columns_drops_inclusive_range():
