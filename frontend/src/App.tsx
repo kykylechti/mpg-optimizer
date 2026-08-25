@@ -4,11 +4,15 @@ import { PlayerTable } from './components/PlayerTable';
 import { LayoutDashboard, Sparkles } from 'lucide-react';
 
 function App() {
-  const [players, setPlayers] = useState([
+  const [rawPlayers, setRawPlayers] = useState([
     { Joueur: 'Kylian Mbappé', Poste: 'ATT', Cote: 95 },
     { Joueur: 'Ousmane Dembele', Poste: 'ATT', Cote: 75 },
     { Joueur: 'Achraf Hakimi', Poste: 'DEF', Cote: 80 },
   ]);
+  const [processedPlayers, setProcessedPlayers] = useState<any[]>([]);
+  const [activeView, setActiveView] = useState<'raw' | 'processed'>('raw');
+
+  const displayedPlayers = activeView === 'raw' ? rawPlayers : processedPlayers;
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 p-6 md:p-10 font-sans selection:bg-emerald-500 selection:text-white">
@@ -29,9 +33,43 @@ function App() {
           </div>
         </header>
 
-        <main>
-          <FileUpload onDataLoaded={(newData) => setPlayers(newData)} />
-          <PlayerTable players={players} />
+        <main className="space-y-6">
+          <FileUpload
+            onRawDataLoaded={(newData) => {
+              setRawPlayers(newData);
+              setActiveView('raw');
+            }}
+            onProcessedDataLoaded={(newData) => {
+              setProcessedPlayers(newData);
+              setActiveView('processed');
+            }}
+          />
+
+          <div className="inline-flex bg-slate-900 border border-slate-800 rounded-xl p-1 gap-1">
+            <button
+              onClick={() => setActiveView('raw')}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+                activeView === 'raw'
+                  ? 'bg-emerald-500 text-slate-950'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              Raw data
+            </button>
+            <button
+              onClick={() => setActiveView('processed')}
+              disabled={processedPlayers.length === 0}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition disabled:opacity-40 disabled:cursor-not-allowed ${
+                activeView === 'processed'
+                  ? 'bg-emerald-500 text-slate-950'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              Processed data
+            </button>
+          </div>
+
+          <PlayerTable players={displayedPlayers} />
         </main>
       </div>
     </div>
