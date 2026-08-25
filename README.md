@@ -29,4 +29,9 @@ My data come from [mpgstats](https://www.mpgstats.fr/players/Ligue-1/season) whi
 
 The first step of my data processing is to clean and normalize column names by removing accents, converting to lowercase, and replacing special characters with underscores.
 
+Then we can apply some feature engineering to add relevant new features that could help our prediction model. 
+
+1. A metric that compute the ratio between goals scored by the player and his price
+2. A metric that compute the ratio between average grade of a player and his price
+
 ## My strategy

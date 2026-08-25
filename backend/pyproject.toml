@@ -9,6 +9,8 @@ dependencies = [
     "jupyter>=1.1.1",
     "numpy>=2.5.1",
     "pandas>=3.0.5",
+    "pytest>=9.1.1",
+    "pytest-cov>=7.1.0",
     "python-multipart>=0.0.32",
     "requests>=2.34.2",
     "ruff>=0.16.2",
@@ -59,3 +61,6 @@ quote-style = "double"
 indent-style = "space"
 skip-magic-trailing-comma = false
 line-ending = "auto"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
