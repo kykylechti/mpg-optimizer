@@ -23,7 +23,7 @@ COLS_TO_DROP = [
     ["cleansheet", "corner_gagn"],
     ["ballons", "balle_non_rattrap_e"],
     ["cote_pr_dite", "cote_pr_dite"],
-    ["note", "note_s_rie"],
+    # ["note", "note_s_rie"],
     ["note_m11", "nb_match_s_rie"],
     ["temps", "temps_s_rie"],
     ["tps_moy", "tps_moy_s_rie"],
@@ -201,6 +201,7 @@ def process_data(players: pd.DataFrame) -> pd.DataFrame:
 
     # Normalizing economic columns
     processed_players = clean_numeric_columns(processed_players, ECONOMIC_COLS)
+    processed_players = clean_numeric_columns(processed_players, ["but", "note"])
     processed_players = normalize_economic_columns(processed_players)
 
     # Feature engineering
