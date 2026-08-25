@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import { UploadCloud, FileText, Loader2, Wand2 } from 'lucide-react';
 
 interface FileUploadProps {
-  onDataLoaded: (data: any[]) => void;
+  onRawDataLoaded: (data: any[]) => void;
+  onProcessedDataLoaded: (data: any[]) => void;
 }
 
-export const FileUpload: React.FC<FileUploadProps> = ({ onDataLoaded }) => {
+export const FileUpload: React.FC<FileUploadProps> = ({ onRawDataLoaded, onProcessedDataLoaded }) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -22,7 +23,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onDataLoaded }) => {
       try {
         const text = event.target?.result as string;
         const lines = text.split('\n').filter(line => line.trim() !== '');
-        
+
         if (lines.length > 0) {
           const headers = lines[0].split(';');
           const parsedData = lines.slice(1).map(line => {
@@ -33,15 +34,14 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onDataLoaded }) => {
             });
             return rowData;
           });
-          onDataLoaded(parsedData);
+          onRawDataLoaded(parsedData);
         }
       } catch (err) {
         setError("Error parsing the local CSV file.");
       }
     };
     reader.onerror = () => setError("Failed to read the file.");
-    
-    // Read locally with ISO-8859-1 for French accents
+
     reader.readAsText(file, 'ISO-8859-1');
   };
 
@@ -65,8 +65,8 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onDataLoaded }) => {
       }
 
       const data = await response.json();
-      onDataLoaded(data); 
-      
+      onProcessedDataLoaded(data);
+
     } catch (err: any) {
       setError(err.message || "Failed to reach the API. Is the server running?");
     } finally {
@@ -85,7 +85,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onDataLoaded }) => {
           <p className="text-slate-400 text-xs">Upload your CSV to preview, then optimize it.</p>
         </div>
       </div>
-      
+
       {error && (
         <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 text-red-400 text-sm rounded-lg">
           {error}
@@ -96,17 +96,17 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onDataLoaded }) => {
         selectedFile ? 'border-emerald-500/50 bg-emerald-500/5' : 'border-slate-600/60 hover:border-emerald-500 hover:bg-slate-700/20'
       } cursor-pointer`}>
         <FileText className={`${selectedFile ? 'text-emerald-400' : 'text-slate-500 group-hover:text-emerald-400'} mb-2 transition`} size={36} />
-        
+
         <span className="text-slate-200 font-medium text-sm">
-          {selectedFile 
-            ? `Selected file: ${selectedFile.name}` 
+          {selectedFile
+            ? `Selected file: ${selectedFile.name}`
             : "Click here or drag and drop your CSV file"}
         </span>
-        <input 
-          type="file" 
-          accept=".csv" 
-          onChange={handleFileChange} 
-          className="hidden" 
+        <input
+          type="file"
+          accept=".csv"
+          onChange={handleFileChange}
+          className="hidden"
           disabled={isProcessing}
         />
       </label>
