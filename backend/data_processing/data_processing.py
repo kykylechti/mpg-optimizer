@@ -140,13 +140,10 @@ def feature_engineering(players: pd.DataFrame) -> pd.DataFrame:
             processed_players["but"] / processed_players["cote"]
         )
 
-        
     # create a new feature "roi" that equals the ratio of "note" to "cote"
     # if both columns exist
     if "cote" in processed_players.columns and "note" in processed_players.columns:
-        processed_players["roi"] = (
-            processed_players["note"] / processed_players["cote"]
-        )
+        processed_players["roi"] = processed_players["note"] / processed_players["cote"]
 
     return processed_players
 

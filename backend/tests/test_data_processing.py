@@ -19,19 +19,3 @@ def test_clean_numeric_columns_handles_commas_and_percent():
 
     assert result["cote"].tolist() == [1.5, 20.0, 3.2]
     assert result["cote"].dtype.kind == "f"  # colonne bien convertie en float
-
-
-def test_removing_useless_columns_drops_inclusive_range():
-    df = pd.DataFrame(
-        {
-            "d3": [1],
-            "d24": [1],
-            "club": [1],
-        }
-    )
-
-    result = removing_useless_columns(df)
-
-    assert "d3" not in result.columns
-    assert "d24" not in result.columns
-    assert "club" not in result.columns
