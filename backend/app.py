@@ -1,5 +1,9 @@
 
+import io
+import traceback
+
 import numpy as np
+import pandas as pd
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -9,7 +13,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=["http://localhost:3000", "http://localhost:5173"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -24,7 +28,11 @@ async def process_dataset(file: UploadFile | None = None):
         raise HTTPException(status_code=400, detail="File must be a CSV.")
 
     try:
-        df = load_data()
+        contents = await file.read()
+        try:
+            df = pd.read_csv(io.BytesIO(contents), sep=";", encoding="utf-8")
+        except UnicodeDecodeError:
+            df = pd.read_csv(io.BytesIO(contents), sep=";", encoding="ISO-8859-1")
 
         df = process_data(df)
         df = df.replace([np.inf, -np.inf], np.nan)
@@ -33,6 +41,7 @@ async def process_dataset(file: UploadFile | None = None):
         return df.to_dict(orient="records")
 
     except Exception as e:
+        traceback.print_exc()
         raise HTTPException(
             status_code=500, detail=f"Error during processing : {str(e)}"
         ) from e
