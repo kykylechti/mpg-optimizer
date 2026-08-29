@@ -20,15 +20,6 @@ ECONOMIC_COLS = [
 ]
 
 COLS_TO_DROP = [
-    ["cleansheet", "corner_gagn"],
-    ["ballons", "balle_non_rattrap_e"],
-    ["cote_pr_dite", "cote_pr_dite"],
-    # ["note", "note_s_rie"],
-    ["note_m11", "nb_match_s_rie"],
-    ["temps", "temps_s_rie"],
-    ["tps_moy", "tps_moy_s_rie"],
-    ["min_but", "min_but"],
-    ["prix_but", "prix_but"],
     ["prochain_opposant", "unnamed_120"],
 ]
 
