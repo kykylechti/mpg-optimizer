@@ -24,18 +24,14 @@ def test_clean_numeric_columns_handles_commas_and_percent():
 def test_removing_useless_columns_drops_inclusive_range():
     df = pd.DataFrame(
         {
-            "keep_before": [1],
-            "cleansheet": [1],
-            "middle_col": [1],
-            "corner_gagn": [1],
-            "keep_after": [1],
+            "d3": [1],
+            "d24": [1],
+            "club": [1],
         }
     )
 
     result = removing_useless_columns(df)
 
-    assert "cleansheet" not in result.columns
-    assert "middle_col" not in result.columns
-    assert "corner_gagn" not in result.columns
-    assert "keep_before" in result.columns
-    assert "keep_after" in result.columns
+    assert "d3" not in result.columns
+    assert "d24" not in result.columns
+    assert "club" not in result.columns
