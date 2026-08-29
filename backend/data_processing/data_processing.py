@@ -15,6 +15,7 @@ ECONOMIC_COLS = [
 
 COLS_TO_DROP = [
     ["prochain_opposant", "unnamed_120"],
+    ["d1", "victoire_j_18"],
 ]
 
 
@@ -124,8 +125,8 @@ def feature_engineering(players: pd.DataFrame) -> pd.DataFrame:
     processed_players = players.copy()
 
     scaler = MinMaxScaler()
-    processed_players["but"] = scaler.fit_transform(
-        processed_players["but"].values.reshape(-1, 1)
+    processed_players["buts"] = scaler.fit_transform(
+        processed_players["buts"].values.reshape(-1, 1)
     )
 
     processed_players["note"] = scaler.fit_transform(
@@ -186,7 +187,7 @@ def process_data(players: pd.DataFrame) -> pd.DataFrame:
 
     # Normalizing economic columns
     processed_players = clean_numeric_columns(processed_players, ECONOMIC_COLS)
-    processed_players = clean_numeric_columns(processed_players, ["but", "note"])
+    processed_players = clean_numeric_columns(processed_players, ["buts", "note"])
     processed_players = normalize_economic_columns(processed_players)
 
     # Feature engineering
@@ -202,4 +203,7 @@ def load_data() -> pd.DataFrame:
     Returns:
         pd.DataFrame: DataFrame containing player data.
     """
-    return pd.read_csv("data/players.csv", sep=";", encoding="utf-8")
+    try:
+        return pd.read_csv("data/players.csv", sep=";", encoding="utf-8")
+    except UnicodeDecodeError:
+        return pd.read_csv("data/players.csv", sep=";", encoding="ISO-8859-1")
