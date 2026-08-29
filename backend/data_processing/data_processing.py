@@ -6,17 +6,11 @@ from sklearn.preprocessing import MinMaxScaler
 ECONOMIC_COLS = [
     "cote",
     "var_cote",
-    "ench_re_moy",
-    "achat",
-    "achat_tour_1",
-    "q2_toutes_tailles",
-    "q3_toutes_tailles",
-    "q2_6_joueurs",
-    "q3_6_joueurs",
-    "q2_8_joueurs",
-    "q3_8_joueurs",
-    "q2_10_joueurs",
-    "q3_10_joueurs",
+    "enchere_moy_l8",
+    "enchere_q2_l8",
+    "enchere_q3_l8",
+    "achat_t1_l8",
+    "enchere_max_l8",
 ]
 
 COLS_TO_DROP = [
