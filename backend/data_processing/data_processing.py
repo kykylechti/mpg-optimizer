@@ -217,4 +217,7 @@ def load_data() -> pd.DataFrame:
     Returns:
         pd.DataFrame: DataFrame containing player data.
     """
-    return pd.read_csv("data/players.csv", sep=";", encoding="utf-8")
+    try:
+        return pd.read_csv("data/players.csv", sep=";", encoding="utf-8")
+    except UnicodeDecodeError:
+        return pd.read_csv("data/players.csv", sep=";", encoding="ISO-8859-1")
