@@ -6,30 +6,16 @@ from sklearn.preprocessing import MinMaxScaler
 ECONOMIC_COLS = [
     "cote",
     "var_cote",
-    "ench_re_moy",
-    "achat",
-    "achat_tour_1",
-    "q2_toutes_tailles",
-    "q3_toutes_tailles",
-    "q2_6_joueurs",
-    "q3_6_joueurs",
-    "q2_8_joueurs",
-    "q3_8_joueurs",
-    "q2_10_joueurs",
-    "q3_10_joueurs",
+    "enchere_moy_l8",
+    "enchere_q2_l8",
+    "enchere_q3_l8",
+    "achat_t1_l8",
+    "enchere_max_l8",
 ]
 
 COLS_TO_DROP = [
-    ["cleansheet", "corner_gagn"],
-    ["ballons", "balle_non_rattrap_e"],
-    ["cote_pr_dite", "cote_pr_dite"],
-    # ["note", "note_s_rie"],
-    ["note_m11", "nb_match_s_rie"],
-    ["temps", "temps_s_rie"],
-    ["tps_moy", "tps_moy_s_rie"],
-    ["min_but", "min_but"],
-    ["prix_but", "prix_but"],
     ["prochain_opposant", "unnamed_120"],
+    ["d1", "victoire_j_18"],
 ]
 
 
@@ -139,8 +125,8 @@ def feature_engineering(players: pd.DataFrame) -> pd.DataFrame:
     processed_players = players.copy()
 
     scaler = MinMaxScaler()
-    processed_players["but"] = scaler.fit_transform(
-        processed_players["but"].values.reshape(-1, 1)
+    processed_players["buts"] = scaler.fit_transform(
+        processed_players["buts"].values.reshape(-1, 1)
     )
 
     processed_players["note"] = scaler.fit_transform(
@@ -198,7 +184,7 @@ def process_data(players: pd.DataFrame) -> pd.DataFrame:
 
     # Normalizing economic columns
     processed_players = clean_numeric_columns(processed_players, ECONOMIC_COLS)
-    processed_players = clean_numeric_columns(processed_players, ["but", "note"])
+    processed_players = clean_numeric_columns(processed_players, ["buts", "note"])
     processed_players = normalize_economic_columns(processed_players)
 
     # Feature engineering
