@@ -1,12 +1,17 @@
 import React, { useState } from 'react';
-import { UploadCloud, FileText, Loader2, Wand2 } from 'lucide-react';
+import { UploadCloud, FileText, Loader2, Wand2, Dices } from 'lucide-react';
 
 interface FileUploadProps {
   onRawDataLoaded: (data: any[]) => void;
   onProcessedDataLoaded: (data: any[]) => void;
+  onInferredDataLoaded: (data: any[]) => void; 
 }
 
-export const FileUpload: React.FC<FileUploadProps> = ({ onRawDataLoaded, onProcessedDataLoaded }) => {
+export const FileUpload: React.FC<FileUploadProps> = ({ 
+  onRawDataLoaded, 
+  onProcessedDataLoaded,
+  onInferredDataLoaded
+}) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -47,10 +52,8 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onRawDataLoaded, onProce
 
   const handleProcessClick = async () => {
     if (!selectedFile) return;
-
     setIsProcessing(true);
     setError(null);
-
     const formData = new FormData();
     formData.append("file", selectedFile);
 
@@ -59,13 +62,37 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onRawDataLoaded, onProce
         method: "POST",
         body: formData,
       });
+      if (!response.ok) throw new Error("Server processing error.");
+      const data = await response.json();
+      onProcessedDataLoaded(data);
+    } catch (err: any) {
+      setError(err.message || "Failed to reach the API.");
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleInferClick = async () => {
+    if (!selectedFile) return;
+
+    setIsProcessing(true);
+    setError(null);
+
+    const formData = new FormData();
+    formData.append("file", selectedFile);
+
+    try {
+      const response = await fetch("http://localhost:8000/api/infer-dataset", {
+        method: "POST",
+        body: formData,
+      });
 
       if (!response.ok) {
-        throw new Error("Server processing error.");
+        throw new Error("Server inference error.");
       }
 
       const data = await response.json();
-      onProcessedDataLoaded(data);
+      onInferredDataLoaded(data);
 
     } catch (err: any) {
       setError(err.message || "Failed to reach the API. Is the server running?");
@@ -96,39 +123,30 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onRawDataLoaded, onProce
         selectedFile ? 'border-emerald-500/50 bg-emerald-500/5' : 'border-slate-600/60 hover:border-emerald-500 hover:bg-slate-700/20'
       } cursor-pointer`}>
         <FileText className={`${selectedFile ? 'text-emerald-400' : 'text-slate-500 group-hover:text-emerald-400'} mb-2 transition`} size={36} />
-
         <span className="text-slate-200 font-medium text-sm">
-          {selectedFile
-            ? `Selected file: ${selectedFile.name}`
-            : "Click here or drag and drop your CSV file"}
+          {selectedFile ? `Selected file: ${selectedFile.name}` : "Click here or drag and drop your CSV file"}
         </span>
-        <input
-          type="file"
-          accept=".csv"
-          onChange={handleFileChange}
-          className="hidden"
-          disabled={isProcessing}
-        />
+        <input type="file" accept=".csv" onChange={handleFileChange} className="hidden" disabled={isProcessing} />
       </label>
 
       {selectedFile && (
-        <div className="mt-4 flex justify-end">
+        <div className="mt-4 flex flex-wrap justify-end gap-3">
           <button
             onClick={handleProcessClick}
             disabled={isProcessing}
+            className="flex items-center gap-2 bg-slate-700 hover:bg-slate-600 text-white font-semibold py-2.5 px-6 rounded-xl transition-all disabled:opacity-70 disabled:cursor-not-allowed"
+          >
+            {isProcessing ? <Loader2 size={18} className="animate-spin" /> : <Wand2 size={18} />}
+            Optimize Dataset
+          </button>
+          
+          <button
+            onClick={handleInferClick}
+            disabled={isProcessing}
             className="flex items-center gap-2 bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-semibold py-2.5 px-6 rounded-xl transition-all disabled:opacity-70 disabled:cursor-not-allowed shadow-lg shadow-emerald-500/20"
           >
-            {isProcessing ? (
-              <>
-                <Loader2 size={18} className="animate-spin" />
-                Processing...
-              </>
-            ) : (
-              <>
-                <Wand2 size={18} />
-                Optimize Dataset
-              </>
-            )}
+            {isProcessing ? <Loader2 size={18} className="animate-spin" /> : <Dices size={18} />}
+            Generate Team
           </button>
         </div>
       )}
