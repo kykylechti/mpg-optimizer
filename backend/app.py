@@ -56,6 +56,8 @@ async def infer_dataset(file: UploadFile | None = None):
             df = pd.read_csv(io.BytesIO(contents), sep=";", encoding="ISO-8859-1")
 
         players_to_return = infer_data(df)
+        players_to_return = players_to_return.replace([np.inf, -np.inf], np.nan)
+        players_to_return = players_to_return.fillna("")
 
         return players_to_return.to_dict(orient="records")
 
