@@ -10,9 +10,13 @@ function App() {
     { Joueur: 'Achraf Hakimi', Poste: 'DEF', Cote: 80 },
   ]);
   const [processedPlayers, setProcessedPlayers] = useState<any[]>([]);
-  const [activeView, setActiveView] = useState<'raw' | 'processed'>('raw');
+  const [inferredPlayers, setInferredPlayers] = useState<any[]>([]);
+  const [activeView, setActiveView] = useState<'raw' | 'processed' | 'inferred'>('raw');
 
-  const displayedPlayers = activeView === 'raw' ? rawPlayers : processedPlayers;
+  const displayedPlayers = 
+    activeView === 'raw' ? rawPlayers : 
+    activeView === 'processed' ? processedPlayers : 
+    inferredPlayers;
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 p-6 md:p-10 font-sans selection:bg-emerald-500 selection:text-white">
@@ -43,15 +47,17 @@ function App() {
               setProcessedPlayers(newData);
               setActiveView('processed');
             }}
+            onInferredDataLoaded={(newData) => {
+              setInferredPlayers(newData);
+              setActiveView('inferred');
+            }}
           />
 
           <div className="inline-flex bg-slate-900 border border-slate-800 rounded-xl p-1 gap-1">
             <button
               onClick={() => setActiveView('raw')}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
-                activeView === 'raw'
-                  ? 'bg-emerald-500 text-slate-950'
-                  : 'text-slate-400 hover:text-white'
+                activeView === 'raw' ? 'bg-emerald-500 text-slate-950' : 'text-slate-400 hover:text-white'
               }`}
             >
               Raw data
@@ -60,12 +66,19 @@ function App() {
               onClick={() => setActiveView('processed')}
               disabled={processedPlayers.length === 0}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition disabled:opacity-40 disabled:cursor-not-allowed ${
-                activeView === 'processed'
-                  ? 'bg-emerald-500 text-slate-950'
-                  : 'text-slate-400 hover:text-white'
+                activeView === 'processed' ? 'bg-emerald-500 text-slate-950' : 'text-slate-400 hover:text-white'
               }`}
             >
               Processed data
+            </button>
+            <button
+              onClick={() => setActiveView('inferred')}
+              disabled={inferredPlayers.length === 0}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition disabled:opacity-40 disabled:cursor-not-allowed ${
+                activeView === 'inferred' ? 'bg-emerald-500 text-slate-950' : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              Generated Team
             </button>
           </div>
 
