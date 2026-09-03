@@ -18,6 +18,8 @@ COLS_TO_DROP = [
     ["d1", "victoire_j_18"],
 ]
 
+PRICE = "cote"
+
 
 def clean_column_name(col_name):
     """
@@ -185,7 +187,7 @@ def process_data(players: pd.DataFrame) -> pd.DataFrame:
     # Normalizing economic columns
     processed_players = clean_numeric_columns(processed_players, ECONOMIC_COLS)
     processed_players = clean_numeric_columns(processed_players, ["buts", "note"])
-    processed_players = normalize_economic_columns(processed_players)
+    processed_players = normalize_economic_columns([x for x in ECONOMIC_COLS if x != PRICE])
 
     # Feature engineering
     processed_players = feature_engineering(processed_players)
