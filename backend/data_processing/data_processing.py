@@ -5,6 +5,7 @@ from sklearn.preprocessing import MinMaxScaler
 
 ECONOMIC_COLS = [
     "cote",
+    "note",
     "var_cote",
     "enchere_moy_l8",
     "enchere_q2_l8",
@@ -17,6 +18,8 @@ COLS_TO_DROP = [
     ["prochain_opposant", "unnamed_120"],
     ["d1", "victoire_j_18"],
 ]
+
+PRICE = "cote"
 
 
 def clean_column_name(col_name):
@@ -81,12 +84,19 @@ def normalize_economic_columns(players: pd.DataFrame) -> None:
         pd.DataFrame: DataFrame with normalized economic columns.
     """
     processed_players = players.copy()
-
     scaler = MinMaxScaler()
 
-    processed_players[ECONOMIC_COLS] = scaler.fit_transform(
-        processed_players[ECONOMIC_COLS]
-    )
+    cols_to_scale = [
+        col
+        for col in ECONOMIC_COLS
+        if col in processed_players.columns and col != "cote"
+    ]
+
+    if cols_to_scale:
+        processed_players[cols_to_scale] = scaler.fit_transform(
+            processed_players[cols_to_scale]
+        )
+
     return processed_players
 
 
@@ -174,6 +184,10 @@ def process_data(players: pd.DataFrame) -> pd.DataFrame:
             )
 
             processed_players[col] = processed_players[col].fillna(mode_par_poste)
+
+    if "poste" in processed_players.columns:
+        poste_mapping = {"DC": "D", "DL": "D", "MD": "M", "MO": "M", "G": "G", "A": "A"}
+        processed_players["poste"] = processed_players["poste"].replace(poste_mapping)
 
     processed_players = pd.get_dummies(
         processed_players, columns=["poste"], prefix="poste"
