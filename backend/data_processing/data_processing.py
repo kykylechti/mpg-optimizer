@@ -185,16 +185,9 @@ def process_data(players: pd.DataFrame) -> pd.DataFrame:
 
             processed_players[col] = processed_players[col].fillna(mode_par_poste)
 
-    if 'poste' in processed_players.columns:
-        poste_mapping = {
-            'DC': 'D', 
-            'DL': 'D',
-            'MD': 'M', 
-            'MO': 'M',
-            'G': 'G', 
-            'A': 'A'
-        }
-        processed_players['poste'] = processed_players['poste'].replace(poste_mapping)
+    if "poste" in processed_players.columns:
+        poste_mapping = {"DC": "D", "DL": "D", "MD": "M", "MO": "M", "G": "G", "A": "A"}
+        processed_players["poste"] = processed_players["poste"].replace(poste_mapping)
 
     processed_players = pd.get_dummies(
         processed_players, columns=["poste"], prefix="poste"
