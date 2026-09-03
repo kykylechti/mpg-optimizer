@@ -9,8 +9,8 @@ from compute.infer import (
 @pytest.fixture
 def dummy_players():
     """
-    Génère un faux jeu de données de 15 joueurs pour tester l'algorithme.
-    Il contient 2 Gardiens, 5 Défenseurs, 5 Milieux et 3 Attaquants.
+    Generates a dummy dataset of 15 players for testing the algorithm.
+    It contains 2 Goalkeepers, 5 Defenders, 5 Midfielders and 3 Strikers.
     """
     data = {
         "joueur": [f"Player_{i}" for i in range(15)],
@@ -42,7 +42,7 @@ def dummy_players():
 
 def test_infer_data_returns_correct_size(dummy_players):
     """
-    Vérifie que la fonction aléatoire renvoie bien le bon nombre de joueurs.
+    Checks the number of players returned.
     """
     team_size = 11
     result = infer_data(dummy_players, team_size=team_size)
@@ -53,7 +53,7 @@ def test_infer_data_returns_correct_size(dummy_players):
 
 def test_constraint_optimization_respects_budget_and_tactics(dummy_players):
     """
-    Vérifie que l'optimisateur mathématique respecte TOUTES les contraintes MPG.
+    Checks that the mathematical optimizer respects ALL MPG constraints.
     """
     budget = 400
     result = constraint_optimization_inference(dummy_players, budget=budget)
@@ -70,7 +70,7 @@ def test_constraint_optimization_respects_budget_and_tactics(dummy_players):
 
 def test_constraint_optimization_impossible_budget(dummy_players):
     """
-    Optionnel : Vérifie le comportement si le budget est trop faible pour acheter 11 joueurs.
+    Optional : Checks the behavior if the budget is too low to buy 11 players.
     """
     result = constraint_optimization_inference(dummy_players, budget=10)
 
