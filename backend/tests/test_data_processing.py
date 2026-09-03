@@ -21,12 +21,15 @@ def test_clean_numeric_columns_handles_commas_and_percent():
     assert result["cote"].tolist() == [1.5, 20.0, 3.2]
     assert result["cote"].dtype.kind == "f"
 
+
 def test_normalize_economic_columns_except_price():
-    df = pd.DataFrame({
-        "cote": [1.0, 2.0, 3.0],
-        "var_cote": [10.0, 20.0, 30.0],
-        "enchere_max_l8": [5.0, 10.0, 15.0]
-    })
+    df = pd.DataFrame(
+        {
+            "cote": [1.0, 2.0, 3.0],
+            "var_cote": [10.0, 20.0, 30.0],
+            "enchere_max_l8": [5.0, 10.0, 15.0],
+        }
+    )
 
     result = normalize_economic_columns(df)
 
