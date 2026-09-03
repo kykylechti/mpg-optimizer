@@ -5,6 +5,7 @@ from sklearn.preprocessing import MinMaxScaler
 
 ECONOMIC_COLS = [
     "cote",
+    "note",
     "var_cote",
     "enchere_moy_l8",
     "enchere_q2_l8",
@@ -86,7 +87,8 @@ def normalize_economic_columns(players: pd.DataFrame) -> None:
     scaler = MinMaxScaler()
 
     cols_to_scale = [
-        col for col in ECONOMIC_COLS 
+        col
+        for col in ECONOMIC_COLS
         if col in processed_players.columns and col != "cote"
     ]
 
@@ -94,7 +96,7 @@ def normalize_economic_columns(players: pd.DataFrame) -> None:
         processed_players[cols_to_scale] = scaler.fit_transform(
             processed_players[cols_to_scale]
         )
-        
+
     return processed_players
 
 
@@ -182,6 +184,17 @@ def process_data(players: pd.DataFrame) -> pd.DataFrame:
             )
 
             processed_players[col] = processed_players[col].fillna(mode_par_poste)
+
+    if 'poste' in processed_players.columns:
+        poste_mapping = {
+            'DC': 'D', 
+            'DL': 'D',
+            'MD': 'M', 
+            'MO': 'M',
+            'G': 'G', 
+            'A': 'A'
+        }
+        processed_players['poste'] = processed_players['poste'].replace(poste_mapping)
 
     processed_players = pd.get_dummies(
         processed_players, columns=["poste"], prefix="poste"

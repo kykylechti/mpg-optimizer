@@ -1,4 +1,3 @@
-
 import io
 import traceback
 import numpy as np
@@ -45,6 +44,7 @@ async def process_dataset(file: UploadFile | None = None):
         raise HTTPException(
             status_code=500, detail=f"Error during processing : {str(e)}"
         ) from e
+
 
 @app.post("/api/infer-dataset")
 async def infer_dataset(file: UploadFile | None = None):

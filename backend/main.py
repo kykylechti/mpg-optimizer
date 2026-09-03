@@ -1,6 +1,7 @@
-from data_processing.data_processing import process_data, load_data
-from compute.infer import infer_data
+from data_processing.data_processing import load_data, process_data
+from compute.infer import constraint_optimization_inference
 
 
 players = load_data()
-print(infer_data(players))
+players = process_data(players)
+print(constraint_optimization_inference(players))
