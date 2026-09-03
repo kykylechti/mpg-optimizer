@@ -83,12 +83,18 @@ def normalize_economic_columns(players: pd.DataFrame) -> None:
         pd.DataFrame: DataFrame with normalized economic columns.
     """
     processed_players = players.copy()
-
     scaler = MinMaxScaler()
 
-    processed_players[ECONOMIC_COLS] = scaler.fit_transform(
-        processed_players[ECONOMIC_COLS]
-    )
+    cols_to_scale = [
+        col for col in ECONOMIC_COLS 
+        if col in processed_players.columns and col != "cote"
+    ]
+
+    if cols_to_scale:
+        processed_players[cols_to_scale] = scaler.fit_transform(
+            processed_players[cols_to_scale]
+        )
+        
     return processed_players
 
 
@@ -187,7 +193,7 @@ def process_data(players: pd.DataFrame) -> pd.DataFrame:
     # Normalizing economic columns
     processed_players = clean_numeric_columns(processed_players, ECONOMIC_COLS)
     processed_players = clean_numeric_columns(processed_players, ["buts", "note"])
-    processed_players = normalize_economic_columns([x for x in ECONOMIC_COLS if x != PRICE])
+    processed_players = normalize_economic_columns(processed_players)
 
     # Feature engineering
     processed_players = feature_engineering(processed_players)
